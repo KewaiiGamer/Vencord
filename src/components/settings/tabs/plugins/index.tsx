@@ -41,6 +41,12 @@ import Plugins, { ExcludedPlugins, PluginMeta } from "~plugins";
 
 import { PluginCard } from "./PluginCard";
 import { UIElementsButton } from "./UIElements";
+import {refreshPlugins} from "@utils/pluginRefresher";
+import {relaunch} from "@utils/native";
+import {NotificationData, showNotification} from "@api/Notifications";
+import {RestartIcon} from "@components/Icons";
+import {ButtonProps} from "@components/Button";
+import {IconComponent} from "@utils/types";
 
 export const cl = classNameFactory("vc-plugins-");
 export const logger = new Logger("PluginSettings", "#a6d189");
@@ -285,6 +291,7 @@ function PluginSettings() {
                                 { label: "Show New", value: SearchStatus.NEW },
                                 hasUserPlugins && { label: "Show UserPlugins", value: SearchStatus.USER_PLUGINS },
                                 { label: "Show API Plugins", value: SearchStatus.API_PLUGINS },
+                                { label: "Show APPDATA Plugins", value: SearchStatus.APPDATA_PLUGINS },
                             ].filter(isTruthy)}
                             serialize={String}
                             select={onStatusChange}
@@ -295,7 +302,32 @@ function PluginSettings() {
                 </div>
             </div>
 
-            <HeadingTertiary className={Margins.top20}>Plugins</HeadingTertiary>
+            <HeadingTertiary className={Margins.top20}>Plugins
+              <ButtonWithIcon
+                variant="primary"
+                onClick={async () => {
+                  const notifyAndClick = (data: NotificationData) => {
+
+                    setTimeout(() => {
+                      showNotification({
+                        permanent: true,
+                        noPersist: true,
+                        ...data
+                      });
+                      if (data.onClick) data.onClick();
+                    }, 500);
+                  };
+                  await refreshPlugins();
+                  notifyAndClick({
+                    title: "Vencord has updated Appdata Plugins!",
+                    body: "Click here to restart",
+                    onClick: relaunch
+                  });
+                }}
+                Icon={RestartIcon}
+              >
+                Rebuild Plugins
+              </ButtonWithIcon></HeadingTertiary>
 
             {plugins.length || requiredPlugins.length
                 ? (
@@ -325,6 +357,14 @@ function PluginSettings() {
     );
 }
 
+function ButtonWithIcon({ children, Icon, className, ...buttonProps }: ButtonProps & { Icon: IconComponent; }) {
+  return (
+    <Button {...buttonProps} className={classes("vc-cloud-icon-with-button", className)}>
+      <Icon className={"vc-cloud-button-icon"} />
+      {children}
+    </Button>
+  );
+}
 function makeDependencyList(deps: string[]) {
     return (
         <>

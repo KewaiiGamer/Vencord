@@ -77,7 +77,8 @@ const enum SearchStatus {
     DISABLED,
     NEW,
     USER_PLUGINS,
-    API_PLUGINS
+    API_PLUGINS,
+    APPDATA_PLUGINS
 }
 
 function ExcludedPluginsList({ search }: { search: string; }) {
@@ -181,6 +182,9 @@ function PluginSettings() {
                 break;
             case SearchStatus.USER_PLUGINS:
                 if (!PluginMeta[plugin.name]?.userPlugin) return false;
+                break;
+            case SearchStatus.APPDATA_PLUGINS:
+                if (!PluginMeta[plugin.name]?.appdataPlugin) return false;
                 break;
             case SearchStatus.API_PLUGINS:
                 if (!plugin.name.endsWith("API")) return false;

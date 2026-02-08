@@ -32,6 +32,7 @@ import { promisify } from "util";
 
 import { getPluginTarget } from "../utils.mjs";
 import { builtinModules } from "module";
+import * as fs from "node:fs";
 
 /** @type {import("../../package.json")} */
 const PackageJSON = JSON.parse(readFileSync("package.json", "utf-8"));
@@ -130,6 +131,7 @@ export const makeAllPackagesExternalPlugin = {
     }
 };
 
+const appdataPluginsFolder = `${process.env.APPDATA?.replaceAll('\\', '/').replace('\.\/', '')}/Vencord/userplugins`
 /**
  * @type {(kind: "web" | "discordDesktop" | "vesktop") => import("esbuild").Plugin}
  */
@@ -145,7 +147,7 @@ export const globPlugins = kind => ({
         });
 
         build.onLoad({ filter, namespace: "import-plugins" }, async () => {
-            const pluginDirs = ["plugins/_api", "plugins/_core", "plugins", "userplugins"];
+            const pluginDirs = ["plugins/_api", "plugins/_core", "plugins", "userplugins", 'appdataplugins'];
             let code = "";
             let pluginsCode = "\n";
             let metaCode = "\n";
@@ -153,11 +155,16 @@ export const globPlugins = kind => ({
             let i = 0;
             for (const dir of pluginDirs) {
                 const userPlugin = dir === "userplugins";
+                const appdataPlugin = dir === 'appdataplugins';
 
-                const fullDir = `./src/${dir}`;
+                const fullDir = appdataPlugin ? appdataPluginsFolder : `./src/${dir}`;
                 if (!await exists(fullDir)) continue;
                 const files = await readdir(fullDir, { withFileTypes: true });
                 for (const file of files) {
+                    if (appdataPlugin) {
+                      if (!fs.existsSync(`./src/${dir}`)) fs.mkdirSync(`./src/${dir}`);
+                      fs.cpSync(`${file.parentPath}/${file.name}`, `./src/${dir}/${file.name}`, {recursive: true});
+                    }
                     const fileName = file.name;
                     if (fileName.startsWith("_") || fileName.startsWith(".")) continue;
                     if (fileName === "index.ts") continue;
@@ -184,7 +191,7 @@ export const globPlugins = kind => ({
                     const mod = `p${i}`;
                     code += `import ${mod} from "./${dir}/${fileName.replace(/\.tsx?$/, "")}";\n`;
                     pluginsCode += `[${mod}.name]:${mod},\n`;
-                    metaCode += `[${mod}.name]:${JSON.stringify({ folderName, userPlugin })},\n`;
+                    metaCode += `[${mod}.name]:${JSON.stringify({ folderName, userPlugin, appdataPlugin })},\n`;
                     i++;
                 }
             }

@@ -7,6 +7,10 @@ The cutest Discord client mod
 
 ![](https://github.com/user-attachments/assets/3fac98c0-c411-4d2a-97a3-13b7da8687a2)
 
+## Fork Features
+- Load plugins from %appdata%/Vencord/userplugins
+- Add button on Plugin tab to Rebuild Plugins (from %appdata%)
+
 ## Features
 
 -   Easy to install

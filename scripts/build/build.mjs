@@ -59,6 +59,7 @@ const nodeCommonOpts = {
 const sourceMapFooter = s => watch ? "" : `//# sourceMappingURL=vencord://${s}.js.map`;
 const sourcemap = watch ? "inline" : "external";
 
+const appdataPluginsFolder = `${process.env.APPDATA?.replaceAll('\\', '/').replace('\.\/', '')}/Vencord/userplugins`;
 /**
  * @type {import("esbuild").Plugin}
  */
@@ -74,7 +75,7 @@ const globNativesPlugin = {
         });
 
         build.onLoad({ filter, namespace: "import-natives" }, async () => {
-            const pluginDirs = ["plugins", "userplugins"];
+            const pluginDirs = ["plugins", "userplugins", "appdataplugins"];
             let code = "";
             let natives = "\n";
             let i = 0;
@@ -83,7 +84,8 @@ const globNativesPlugin = {
              */
             const watchFiles = [];
             for (const dir of pluginDirs) {
-                const dirPath = join("src", dir);
+                const appdataPlugin = dir === 'appdataplugins';
+                const dirPath = appdataPlugin ? appdataPluginsFolder : join("src", dir);;
                 if (!await exists(dirPath)) continue;
                 const plugins = await readdir(dirPath, { withFileTypes: true });
                 for (const file of plugins) {

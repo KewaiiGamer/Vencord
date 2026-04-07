@@ -10,6 +10,7 @@ The cutest Discord client mod
 ## Fork Features
 - Load plugins from %appdata%/Vencord/userplugins
 - Add button on Plugin tab to Rebuild Plugins (from %appdata%)
+- Includes klipy.com gif provider
 
 ## Features
 

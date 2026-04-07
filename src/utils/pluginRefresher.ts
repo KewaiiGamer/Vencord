@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import {IpcRes} from "./types";
+import { IpcRes } from "./types";
 
 export let updateError: any;
 

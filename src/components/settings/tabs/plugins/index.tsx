@@ -19,12 +19,15 @@
 import "./styles.css";
 
 import * as DataStore from "@api/DataStore";
+import { NotificationData, showNotification } from "@api/Notifications";
 import { isPluginEnabled } from "@api/PluginManager";
 import { useSettings } from "@api/Settings";
+import { ButtonProps } from "@components/Button";
 import { Card } from "@components/Card";
 import { Divider } from "@components/Divider";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { HeadingTertiary } from "@components/Heading";
+import { RestartIcon } from "@components/Icons";
 import { Paragraph } from "@components/Paragraph";
 import { SettingsTab, wrapTab } from "@components/settings/tabs/BaseTab";
 import { ChangeList } from "@utils/ChangeList";
@@ -33,7 +36,10 @@ import { isTruthy } from "@utils/guards";
 import { Logger } from "@utils/Logger";
 import { Margins } from "@utils/margins";
 import { classes } from "@utils/misc";
+import { relaunch } from "@utils/native";
+import { refreshPlugins } from "@utils/pluginRefresher";
 import { useAwaiter, useCleanupEffect } from "@utils/react";
+import { IconComponent } from "@utils/types";
 import { Alerts, Button, lodash, Parser, React, Select, TextInput, Tooltip, useMemo, useState } from "@webpack/common";
 import { JSX } from "react";
 
@@ -41,12 +47,6 @@ import Plugins, { ExcludedPlugins, PluginMeta } from "~plugins";
 
 import { PluginCard } from "./PluginCard";
 import { UIElementsButton } from "./UIElements";
-import {refreshPlugins} from "@utils/pluginRefresher";
-import {relaunch} from "@utils/native";
-import {NotificationData, showNotification} from "@api/Notifications";
-import {RestartIcon} from "@components/Icons";
-import {ButtonProps} from "@components/Button";
-import {IconComponent} from "@utils/types";
 
 export const cl = classNameFactory("vc-plugins-");
 export const logger = new Logger("PluginSettings", "#a6d189");

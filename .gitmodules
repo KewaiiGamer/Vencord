@@ -1,0 +1,3 @@
+[submodule "src/plugins/VencordKlipyPlugin"]
+	path = src/plugins/VencordKlipyPlugin
+	url = git@github.com:KewaiiGamer/VencordKlipyPlugin.git
